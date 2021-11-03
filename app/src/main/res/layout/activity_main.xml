@@ -9,6 +9,7 @@
     <LinearLayout
         android:layout_width="414dp"
         android:layout_height="728dp"
+        android:background="#1976D2"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -16,26 +17,42 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/tv1"
             android:layout_width="match_parent"
             android:layout_height="68dp"
-            android:text="Witaj w aplikacji Messenger" />
+            android:gravity="center"
+            android:text="@string/welcome"
+            android:textColor="#FFFFFF"
+            android:textColorLink="#FFEBEE"
+            android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srcCompat="@mipmap/ic_launcher_background" />
+            android:layout_height="250dp"
+            app:srcCompat="@drawable/messenger" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:gravity="center"
+            android:text="@string/apk_name"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="20px"
+            android:gravity="bottom"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/button2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20px"
+                android:layout_marginLeft="30px"
                 android:layout_marginRight="20px"
                 android:layout_weight="1"
                 android:text="Rejestracja" />
@@ -45,7 +62,7 @@
                 android:layout_width="198dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20px"
-                android:layout_marginRight="20px"
+                android:layout_marginRight="30px"
                 android:text="Logowanie" />
         </LinearLayout>
 

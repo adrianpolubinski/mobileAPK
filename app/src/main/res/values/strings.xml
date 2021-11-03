@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">mobileAPK</string>
+    <string name="welcome">Witaj w naszej aplikacji!</string>
+    <string name="apk_name">POGADANKOWO</string>
 </resources>
