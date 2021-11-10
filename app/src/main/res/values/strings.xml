@@ -2,4 +2,10 @@
     <string name="app_name">mobileAPK</string>
     <string name="welcome">Witaj w naszej aplikacji!</string>
     <string name="apk_name">POGADANKOWO</string>
+    <string name="witaj">Witaj! Zarejestruj się by móc dołączyć do czatu.</string>
+    <string name="pt_login_rejestracja">Login</string>
+    <string name="pass_haslo_rejestracja">Hasło</string>
+    <string name="zaakceptuj">Akceptuję</string>
+    <string name="regulamin"><a href="https://www.google.com/search?q=regulamin">regulamin</a></string>
+    <string name="rejestruj">Zarejestruj</string>
 </resources>
