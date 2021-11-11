@@ -35,7 +35,7 @@
                 android:minHeight="48dp" />
 
             <EditText
-                android:id="@+id/et_haslo"
+                android:id="@+id/et_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
@@ -45,7 +45,7 @@
                 android:minHeight="48dp" />
 
             <EditText
-                android:id="@+id/et_haslor"
+                android:id="@+id/et_passwordr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
@@ -65,7 +65,7 @@
                 android:minHeight="48dp" />
 
             <EditText
-                android:id="@+id/et_imie"
+                android:id="@+id/et_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
@@ -75,7 +75,7 @@
                 android:minHeight="48dp" />
 
             <EditText
-                android:id="@+id/et_nazwisko"
+                android:id="@+id/et_surname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
@@ -90,14 +90,14 @@
                 android:orientation="horizontal">
 
                 <CheckBox
-                    android:id="@+id/chb_regulamin"
+                    android:id="@+id/chb_reg"
                     android:layout_width="105dp"
                     android:layout_height="48dp"
                     android:layout_marginBottom="20dp"
                     android:text="@string/zaakceptuj" />
 
                 <TextView
-                    android:id="@+id/tv_regulamin"
+                    android:id="@+id/tv_reg"
                     android:layout_width="100dp"
                     android:layout_height="48dp"
                     android:clickable="true"
@@ -107,7 +107,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btn_zarejestruj"
+                android:id="@+id/btn_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="onClick"
