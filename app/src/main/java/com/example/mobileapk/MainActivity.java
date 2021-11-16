@@ -24,8 +24,8 @@ import io.realm.mongodb.mongo.MongoDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btn_reg;
-    Intent i_reg;
+    Button btn_reg, btn_log;
+    Intent i_reg, i_log;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
         btn_reg = findViewById(R.id.btn_register);
         i_reg = new Intent(this, RegisterActivity.class);
+
+        btn_log = findViewById(R.id.btn_log);
+        i_log = new Intent(this, LoginActivity.class);
 
 
 //wylogowanie
@@ -51,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
         switch (view.getId()){
             case R.id.bt_reg:
                 startActivity(i_reg);
+                break;
+            case R.id.btn_log:
+                startActivity(i_log);
                 break;
             default: break;
         }

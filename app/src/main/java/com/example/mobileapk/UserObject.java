@@ -2,8 +2,15 @@ package com.example.mobileapk;
 
 import org.bson.types.ObjectId;
 
-public class User {
-    private ObjectId id;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
+
+public class UserObject{
+
+    private ObjectId id = new ObjectId();
+
+
     private String login;
     private String password;
     private String mail;
@@ -11,11 +18,11 @@ public class User {
     private String surname;
     private String data;
 
-    public User() {
+    public UserObject() {
     }
 
-    public User(ObjectId id, String login, String password, String mail, String name, String surname, String data) {
-        this.id = id;
+    public UserObject(String login, String password, String mail, String name, String surname, String data) {
+
         this.login = login;
         this.password = password;
         this.mail = mail;
@@ -52,6 +59,9 @@ public class User {
         return data;
     }
 
+
+
+
     public void setId(ObjectId id) {
         this.id = id;
     }
@@ -79,6 +89,8 @@ public class User {
     public void setData(String data) {
         this.data = data;
     }
+
+
 
     @Override
     public String toString() {

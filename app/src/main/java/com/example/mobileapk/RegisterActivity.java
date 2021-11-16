@@ -6,7 +6,6 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -21,11 +20,6 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -99,15 +93,17 @@ public class RegisterActivity extends AppCompatActivity {
                 MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
                 MongoDatabase mongoDatabase = mongoClient.getDatabase("messanger");
                 CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-                MongoCollection<User> mongoCollection = mongoDatabase.getCollection("users", User.class).withCodecRegistry(pojoCodecRegistry);
+                MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
                 System.out.println("EXAMPLE" + "Successfully instantiated the MongoDB collection handle");
-                mongoCollection.insertOne(new User(new ObjectId(), et_login.getText().toString(), hash(et_passw.getText().toString()), et_mail.getText().toString(), et_name.getText().toString(), et_surname.getText().toString(), currentDate)).getAsync(task -> {
+                mongoCollection.insertOne(new UserObject(et_login.getText().toString(), hash(et_passw.getText().toString()), et_mail.getText().toString(), et_name.getText().toString(), et_surname.getText().toString(), currentDate)).getAsync(task -> {
                     if (task.isSuccess()) {
                         System.out.println("EXAMPLE " + "successfully inserted a document with id: " + task.get().getInsertedId());
                     } else {
                         System.out.println("EXAMPLE " + "failed to insert documents with: " + task.getError().getErrorMessage());
                     }
                 });
+
+
             } else {
                 error = "Zaakceptuj regulamin!";
             }
