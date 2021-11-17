@@ -74,20 +74,20 @@ public class LoginActivity extends AppCompatActivity {
         CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
         MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
 
-        Bson queryFilter = Filters.in("countries", "Tester1");
 
-        mongoCollection.find(queryFilter).first().getAsync(task ->{
+
+        Document queryFilter  = new Document("login", et_login.getText().toString());
+
+        mongoCollection.findOne(queryFilter).getAsync(task -> {
             if (task.isSuccess()) {
+                UserObject result = task.get();
+                Log.v("BAZA DANYCH", "successfully found a document: " + result.getSurname());
 
-                System.out.println(et_login.getText());
+
             } else {
-                System.out.println("EXAMPLE " + "failed to insert documents with: " + task.getError().getErrorMessage());
+                Log.e("BAZA DANYCH", "failed to find document with: ", task.getError());
             }
         });
-
-
-
-
 
     }
 }
