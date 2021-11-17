@@ -4,13 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import org.bson.types.ObjectId;
+
 public class SessionManager {
 
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
     Context context;
-    String login;
-    Boolean stan;
+
 
 
     public SessionManager(Context context){
@@ -20,9 +21,9 @@ public class SessionManager {
 
     }
 
-    public void createLoginSession(int id, String login,String imie, String nazwisko, String avatar){
+    public void createLoginSession(String id, String login, String imie, String nazwisko, String avatar){
         editor.putBoolean("KEY_ISLOGIN",true);
-        editor.putInt("KEY_ID", id);
+        editor.putString("KEY_ID", id);
         editor.putString("KEY_LOGIN", login);
         editor.putString("KEY_IMIE",imie);
         editor.putString("KEY_NAZWISKO",nazwisko);
@@ -32,20 +33,6 @@ public class SessionManager {
     }
 
 
-    public String pobierzLogin() { // login biezacego uzytkownika do update'u hasla
-        login = preferences.getString("KEY_LOGIN", "");
-        return login;
-    }
-
-    public Boolean loadNightModeState () {
-        stan = preferences.getBoolean("KEY_DARK", false);
-        return stan;
-    }
-
-    public void setNightModeState(Boolean stan) {
-        editor.putBoolean("KEY_DARK", stan);
-        editor.commit();
-    }
 
     public void logoutUser(){
         editor.clear();

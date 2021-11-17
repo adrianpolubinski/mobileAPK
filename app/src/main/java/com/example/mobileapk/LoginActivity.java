@@ -1,93 +1,130 @@
 package com.example.mobileapk;
 
-import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-import androidx.appcompat.app.AppCompatActivity;
-import static com.mongodb.client.model.Filters.*;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.client.model.Filters;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bson.conversions.Bson;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.atomic.AtomicReference;
 
 import io.realm.Realm;
 import io.realm.mongodb.App;
 import io.realm.mongodb.AppConfiguration;
 import io.realm.mongodb.Credentials;
-import io.realm.mongodb.User;
 import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
 import io.realm.mongodb.mongo.MongoDatabase;
-import io.realm.mongodb.mongo.options.FindOptions;
-import io.realm.mongodb.sync.ClientResetRequiredError;
-import io.realm.mongodb.sync.SyncConfiguration;
-import io.realm.mongodb.sync.SyncSession;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String PARTITION = "partitionValue";
-    //    private static final String PARTITION = "";
     String Appid = "application-0-tfcfh";
     EditText et_login, et_passw;
+    SessionManager sessionManager;
+    ProgressBar pb;
+    TextView tv_progress;
 
-    App app;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+
         et_login = findViewById(R.id.editTextTextPersonName);
-        et_passw = findViewById(R.id.editTextTextPersonName);
+        et_passw = findViewById(R.id.editTextTextPassword2);
+        pb = findViewById(R.id.progressBar);
+        tv_progress = findViewById(R.id.textView3);
+
         Realm.init(this);
+        sessionManager = new SessionManager(getApplicationContext());
     }
 
 
     public void onClick(View view) {
 
+        closeKeyboard();
+        tv_progress.setTextColor(getResources().getColor(R.color.black));
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+        pb.setVisibility(View.VISIBLE);
+        pb.setProgress(20);
+        tv_progress.setText("Przygotowanie do podłączenia z bazą danych.");
+        tv_progress.setVisibility(View.VISIBLE);
+
+
         App app = new App(new AppConfiguration.Builder(Appid).build());
         Credentials apiKeyCredentials = Credentials.apiKey("H4cVO8qT8q8cehZVoI3QRsiN17XXY2QZZQ0wSDvcAZZck8KZNFL6UuVCdlob5nz2");
-        AtomicReference<User> user = new AtomicReference<io.realm.mongodb.User>();
         app.loginAsync(apiKeyCredentials, it -> {
             if (it.isSuccess()) {
-                user.set(app.currentUser());
+                Log.v("BAZA DANYCH", "Udane logowanie za pomocą api KEY.");
             } else {
-                System.out.println("AUTH" + it.getError().toString());
+                Log.e("BAZA DANYCH", "Wystąpił problem z logowaniem za pomocą api KEY.");
             }
         });
+
         MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
         MongoDatabase mongoDatabase = mongoClient.getDatabase("messanger");
         CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
         MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
 
-
+        tv_progress.setText("Przygotowanie zapytania.");
+        pb.setProgress(40);
 
         Document queryFilter  = new Document("login", et_login.getText().toString());
-
         mongoCollection.findOne(queryFilter).getAsync(task -> {
-            if (task.isSuccess()) {
-                UserObject result = task.get();
-                Log.v("BAZA DANYCH", "successfully found a document: " + result.getSurname());
 
+            tv_progress.setText("Sprawdzanie czy istnieje uzytkownik.");
+            pb.setProgress(60);
 
+            if (task.isSuccess() && task.get()!=null) {
+                UserObject person = task.get();
+                if(BCrypt.checkpw(et_passw.getText().toString(), person.getPassword())){
+                    tv_progress.setText("Finalizowanie");
+                    pb.setProgress(100);
+                    sessionManager.createLoginSession(person.getId().toString(), person.getLogin(), person.getName(), person.getSurname(), "avatar");
+                    Toast.makeText(getApplicationContext(), "Logowanie pomyślne!", Toast.LENGTH_LONG).show();
+                    pb.setVisibility(View.INVISIBLE);
+                    tv_progress.setVisibility(View.INVISIBLE);
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Podano złe hasło.", Toast.LENGTH_LONG).show();
+                    pb.setVisibility(View.INVISIBLE);
+                    tv_progress.setVisibility(View.INVISIBLE);
+                }
             } else {
-                Log.e("BAZA DANYCH", "failed to find document with: ", task.getError());
+                Toast.makeText(getApplicationContext(), "Taki użytkownik nie istnieje.", Toast.LENGTH_LONG).show();
+                pb.setVisibility(View.INVISIBLE);
+                tv_progress.setVisibility(View.INVISIBLE);
             }
         });
 
+        app.currentUser().logOutAsync( result -> {
+            if (result.isSuccess()) {
+                Log.v("BAZA DANYCH", "Wylogowanie udane.");
+            } else {
+                Log.e("BAZA DANYCH", "Wystąpił problem z wylogowaniem.");
+            }
+        });
+
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }
