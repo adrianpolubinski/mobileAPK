@@ -3,6 +3,7 @@ package com.example.mobileapk;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     SessionManager sessionManager;
     ProgressBar pb;
     TextView tv_progress;
+    Intent i_logged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
 
+        i_logged = new Intent(this, LoggedActivity.class);
         et_login = findViewById(R.id.editTextTextPersonName);
         et_passw = findViewById(R.id.editTextTextPassword2);
         pb = findViewById(R.id.progressBar);
@@ -96,6 +99,8 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Logowanie pomyślne!", Toast.LENGTH_LONG).show();
                     pb.setVisibility(View.INVISIBLE);
                     tv_progress.setVisibility(View.INVISIBLE);
+                    startActivity(i_logged);
+
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "Podano złe hasło.", Toast.LENGTH_LONG).show();

@@ -38,16 +38,6 @@ public class MainActivity extends AppCompatActivity {
         btn_log = findViewById(R.id.btn_log);
         i_log = new Intent(this, LoginActivity.class);
 
-
-//wylogowanie
-//        user.get().logOutAsync( result -> {
-//            if (result.isSuccess()) {
-//                System.out.println("AUTH " + "Successfully logged out.");
-//            } else {
-//                System.out.println("AUTH "+ result.getError().toString());
-//            }
-//        });
-
     }
 
     public void onClick(View view){
