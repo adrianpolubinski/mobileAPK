@@ -72,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
         Realm.init(this);
     }
 
-    public void onClick(View view) {
+    public void onClickRegister(View view) {
 
         if (sprawdzLogin(et_login.getText().toString()) && sprawdzHaslo(et_passw.getText().toString(), et_passwr.getText().toString()) && sprwadzMail(et_mail.getText().toString()) && sprawdzImie(et_name.getText().toString()) && sprawdzNazwisko(et_surname.getText().toString())) {
             if (chb_reg.isChecked()) {
@@ -110,10 +110,13 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        if (error != "")
+        if (error != "") {
             Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
+            System.out.println("ERROR: " + error);
+        }
         else {
             Toast.makeText(getApplicationContext(), "Gratulacje !!! Rejestracja pomyślna.", Toast.LENGTH_LONG).show();
+            System.out.println("Gratulacje !!! Rejestracja pomyślna.");
             startActivity(i_main);
         }
     }

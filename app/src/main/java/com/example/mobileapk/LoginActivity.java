@@ -95,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                 if(BCrypt.checkpw(et_passw.getText().toString(), person.getPassword())){
                     tv_progress.setText("Finalizowanie");
                     pb.setProgress(100);
-                    sessionManager.createLoginSession(person.getId().toString(), person.getLogin(), person.getName(), person.getSurname(), "avatar");
+                    sessionManager.createLoginSession(person.getId().toString(), person.getLogin(), person.getUserName().getName(), person.getUserName().getSurname(), "avatar");
                     Toast.makeText(getApplicationContext(), "Logowanie pomyślne!", Toast.LENGTH_LONG).show();
                     pb.setVisibility(View.INVISIBLE);
                     tv_progress.setVisibility(View.INVISIBLE);

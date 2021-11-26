@@ -45,7 +45,7 @@ class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, final int position) {
         context=holder.cardView.getContext();
         TextView tv= holder.cardView.findViewById(R.id.textViewPerson);
-        tv.setText(osoby.get(position).getName() + " " + osoby.get(position).getSurname());
+        tv.setText(osoby.get(position).getUserName().getName() + " " + osoby.get(position).getUserName().getSurname());
     }
 
     @Override

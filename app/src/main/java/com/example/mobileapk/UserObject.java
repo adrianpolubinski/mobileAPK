@@ -2,21 +2,14 @@ package com.example.mobileapk;
 
 import org.bson.types.ObjectId;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-import io.realm.annotations.Required;
-
-public class UserObject{
+public class UserObject {
 
     private ObjectId id = new ObjectId();
-
-
     private String login;
     private String password;
     private String mail;
-    private String name;
-    private String surname;
     private String data;
+    private UserName userName;
 
     public UserObject() {
     }
@@ -26,9 +19,8 @@ public class UserObject{
         this.login = login;
         this.password = password;
         this.mail = mail;
-        this.name = name;
-        this.surname = surname;
         this.data = data;
+        this.userName = new UserName(name, surname);
     }
 
     public ObjectId getId() {
@@ -47,20 +39,13 @@ public class UserObject{
         return mail;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
     public String getData() {
         return data;
     }
 
-
-
+    public UserName getUserName() {
+        return userName;
+    }
 
     public void setId(ObjectId id) {
         this.id = id;
@@ -78,30 +63,23 @@ public class UserObject{
         this.mail = mail;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
     public void setData(String data) {
         this.data = data;
     }
 
-
+    public void setUserName(UserName userName) {
+        this.userName = userName;
+    }
 
     @Override
     public String toString() {
-        return "User{" +
+        return "UserObject{" +
                 "id=" + id +
                 ", login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 ", mail='" + mail + '\'' +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
                 ", data='" + data + '\'' +
+                ", userName=" + userName +
                 '}';
     }
 }
