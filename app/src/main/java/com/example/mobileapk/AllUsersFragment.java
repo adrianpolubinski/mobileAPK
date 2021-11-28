@@ -51,13 +51,12 @@ public class AllUsersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_all_users, container, false);
-        context=v.getContext();
+        context = v.getContext();
         sessionManager = new SessionManager(context);
         person_recycler = v.findViewById(R.id.recyclerView);
         person_recycler.setLayoutManager(new LinearLayoutManager(context));
-        osoby=new ArrayList<>();
+        osoby = new ArrayList<>();
         person_recycler.setAdapter(new Adapter_person(osoby));
-
         RefreshUsers();
         return v;
     }
@@ -80,18 +79,20 @@ public class AllUsersFragment extends Fragment {
         MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
 
 
-        Document queryFilter  = new Document();
+        Document queryFilter = new Document();
         RealmResultTask<MongoCursor<UserObject>> findTask = mongoCollection.find(queryFilter).iterator();
         findTask.getAsync(task -> {
             if (task.isSuccess()) {
                 MongoCursor<UserObject> results = task.get();
                 while (results.hasNext()) {
-                    Log.v("EXAMPLE", results.next().toString());
+//                    Log.v("EXAMPLE", results.next().toString());
+                    osoby.add(results.next());
                 }
             } else {
                 Log.e("EXAMPLE", "failed to find documents with: ", task.getError());
             }
         });
 
+        person_recycler.setAdapter(new Adapter_person(osoby));
     }
 }
