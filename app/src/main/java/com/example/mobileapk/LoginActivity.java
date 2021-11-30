@@ -20,6 +20,7 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
+import es.dmoral.toasty.Toasty;
 import io.realm.Realm;
 import io.realm.mongodb.App;
 import io.realm.mongodb.AppConfiguration;
@@ -48,6 +49,10 @@ public class LoginActivity extends AppCompatActivity {
         et_passw = findViewById(R.id.editTextTextPassword2);
         pb = findViewById(R.id.progressBar);
         tv_progress = findViewById(R.id.textView3);
+
+        //fast login
+        et_login.setText("tester3");
+        et_passw.setText("Tester3.");
 
         Realm.init(this);
         sessionManager = new SessionManager(getApplicationContext());
@@ -96,29 +101,21 @@ public class LoginActivity extends AppCompatActivity {
                     tv_progress.setText("Finalizowanie");
                     pb.setProgress(100);
                     sessionManager.createLoginSession(person.getId().toString(), person.getLogin(), person.getUserName().getName(), person.getUserName().getSurname(), "avatar");
-                    Toast.makeText(getApplicationContext(), "Logowanie pomyślne!", Toast.LENGTH_LONG).show();
+                    Toasty.success(getApplicationContext(), "Logowanie pomyślne!", Toast.LENGTH_SHORT, true).show();
                     pb.setVisibility(View.INVISIBLE);
                     tv_progress.setVisibility(View.INVISIBLE);
                     startActivity(i_logged);
 
                 }
                 else {
-                    Toast.makeText(getApplicationContext(), "Podano złe hasło.", Toast.LENGTH_LONG).show();
+                    Toasty.error(getApplicationContext(), "Podano złe hasło!", Toast.LENGTH_LONG, true).show();
                     pb.setVisibility(View.INVISIBLE);
                     tv_progress.setVisibility(View.INVISIBLE);
                 }
             } else {
-                Toast.makeText(getApplicationContext(), "Taki użytkownik nie istnieje.", Toast.LENGTH_LONG).show();
+                Toasty.warning(getApplicationContext(), "Taki użytkownik nie istnieje.", Toast.LENGTH_SHORT, true).show();
                 pb.setVisibility(View.INVISIBLE);
                 tv_progress.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        app.currentUser().logOutAsync( result -> {
-            if (result.isSuccess()) {
-                Log.v("BAZA DANYCH", "Wylogowanie udane.");
-            } else {
-                Log.e("BAZA DANYCH", "Wystąpił problem z wylogowaniem.");
             }
         });
 

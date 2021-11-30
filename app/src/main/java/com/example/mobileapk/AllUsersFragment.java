@@ -1,39 +1,28 @@
 package com.example.mobileapk;
-
-
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import io.realm.mongodb.App;
 import io.realm.mongodb.AppConfiguration;
 import io.realm.mongodb.Credentials;
 import io.realm.mongodb.RealmResultTask;
-import io.realm.mongodb.User;
 import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
 import io.realm.mongodb.mongo.MongoDatabase;
@@ -56,12 +45,15 @@ public class AllUsersFragment extends Fragment {
         person_recycler = v.findViewById(R.id.recyclerView);
         person_recycler.setLayoutManager(new LinearLayoutManager(context));
         osoby = new ArrayList<>();
+
+        // Repair: E/RecyclerView: No adapter attached; skipping layout
         person_recycler.setAdapter(new Adapter_person(osoby));
-        RefreshUsers();
+
+        refreshUsers();
         return v;
     }
 
-    void RefreshUsers() {
+    void refreshUsers() {
 
         App app = new App(new AppConfiguration.Builder(Appid).build());
         Credentials apiKeyCredentials = Credentials.apiKey("H4cVO8qT8q8cehZVoI3QRsiN17XXY2QZZQ0wSDvcAZZck8KZNFL6UuVCdlob5nz2");
@@ -78,21 +70,18 @@ public class AllUsersFragment extends Fragment {
         CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
         MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
 
-
         Document queryFilter = new Document();
         RealmResultTask<MongoCursor<UserObject>> findTask = mongoCollection.find(queryFilter).iterator();
         findTask.getAsync(task -> {
             if (task.isSuccess()) {
                 MongoCursor<UserObject> results = task.get();
                 while (results.hasNext()) {
-//                    Log.v("EXAMPLE", results.next().toString());
                     osoby.add(results.next());
                 }
+                person_recycler.setAdapter(new Adapter_person(osoby));
             } else {
-                Log.e("EXAMPLE", "failed to find documents with: ", task.getError());
+                Log.e("WYSZUKIWANIE", "failed to find documents with: ", task.getError());
             }
         });
-
-        person_recycler.setAdapter(new Adapter_person(osoby));
     }
 }
