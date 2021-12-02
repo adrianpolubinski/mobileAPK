@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import es.dmoral.toasty.Toasty;
 import io.realm.Realm;
 import io.realm.mongodb.App;
 import io.realm.mongodb.AppConfiguration;
@@ -111,11 +112,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         if (error != "") {
-            Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
+            Toasty.warning(getApplicationContext(), error, Toast.LENGTH_LONG, true).show();
             System.out.println("ERROR: " + error);
         }
         else {
-            Toast.makeText(getApplicationContext(), "Gratulacje !!! Rejestracja pomyślna.", Toast.LENGTH_LONG).show();
+            Toasty.success(getApplicationContext(), "Gratulacje !!! Rejestracja pomyślna.", Toast.LENGTH_LONG, true).show();
             System.out.println("Gratulacje !!! Rejestracja pomyślna.");
             startActivity(i_main);
         }

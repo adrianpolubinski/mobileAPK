@@ -24,9 +24,11 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="open_drawer">Otwórz menu</string>
     <string name="close_drawer">Zamknij menu</string>
-    <string name="open_chat">Otwórz czat</string>
-    <string name="menu_opt1">Opcja 1</string>
-    <string name="menu_opt2">Opcja 2</string>
-    <string name="menu_opt3">Opcja 3</string>
-    <string name="menu_opt4">Opcja 4</string>
+    <string name="open_chat">Użytkownicy</string>
+    <string name="menu_opt1">Czat</string>
+    <string name="menu_opt2">Moje konto</string>
+    <string name="menu_opt3">O aplikacji</string>
+    <string name="menu_opt4">Wyloguj</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
