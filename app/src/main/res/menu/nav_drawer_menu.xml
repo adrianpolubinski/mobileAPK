@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/item1"
-        android:title="@string/menu_opt1" />
-    <item
-        android:id="@+id/item2"
-        android:title="@string/menu_opt2" />
-    <item
-        android:id="@+id/item3"
-        android:title="@string/menu_opt3" />
-    <item
-        android:id="@+id/item4"
-        android:title="@string/menu_opt4" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_first_fragment"
+            android:checked="true"
+            android:icon="@drawable/ic_baseline_group"
+            android:title="Użytkownicy" />
+        <item
+            android:id="@+id/nav_third_fragment"
+            android:icon="@drawable/ic_baseline_room_preferences"
+            android:title="Zmiana motywu" />
+        <item
+            android:id="@+id/nav_fifth_fragment"
+            android:icon="@drawable/ic_baseline_settings"
+            android:title="Ustawienia" />
+
+        <item android:title="Pozostałe">
+            <menu>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_second_fragment"
+                        android:icon="@drawable/ic_baseline_info"
+                        android:title="O nas" />
+                </group>
+            </menu>
+        </item>
+
+        <item
+            android:id="@+id/nav_fourth_fragment"
+            android:icon="@drawable/ic_baseline_login"
+            android:title="Wyloguj" />
+
+    </group>
 </menu>
+

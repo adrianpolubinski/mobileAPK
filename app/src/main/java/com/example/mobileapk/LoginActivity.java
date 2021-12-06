@@ -51,8 +51,8 @@ public class LoginActivity extends AppCompatActivity {
         tv_progress = findViewById(R.id.textView3);
 
         //fast login
-        et_login.setText("tester3");
-        et_passw.setText("Tester3.");
+        et_login.setText("tester4");
+        et_passw.setText("Tester4.");
 
         Realm.init(this);
         sessionManager = new SessionManager(getApplicationContext());
@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                 if(BCrypt.checkpw(et_passw.getText().toString(), person.getPassword())){
                     tv_progress.setText("Finalizowanie");
                     pb.setProgress(100);
-                    sessionManager.createLoginSession(person.getId().toString(), person.getLogin(), person.getUserName().getName(), person.getUserName().getSurname(), "avatar");
+                    sessionManager.createLoginSession(person.getId().toString(), person.getLogin(), person.getUserName().getName(), person.getUserName().getSurname(), person.getAvatar());
                     Toasty.success(getApplicationContext(), "Logowanie pomyślne!", Toast.LENGTH_SHORT, true).show();
                     pb.setVisibility(View.INVISIBLE);
                     tv_progress.setVisibility(View.INVISIBLE);

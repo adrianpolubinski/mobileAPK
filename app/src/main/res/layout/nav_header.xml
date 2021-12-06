@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
-    android:background="@color/black">
+    android:layout_height="192dp"
+    android:background="@color/colorOfHeaderNavigation"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:visibility="visible"
+    >
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/avatar"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:onClick="onClick"
+        android:src="@drawable/avatar"
+        app:civ_border_color="#FFFFFF"
+        app:civ_border_width="2dp"
+        app:civ_circle_background_color="@color/colorOfNavigation"
+        />
+
+    <TextView
+        android:id="@+id/tv_podpis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@android:color/white" />
+
+</LinearLayout>

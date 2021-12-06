@@ -24,13 +24,15 @@ import io.realm.mongodb.mongo.MongoDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
+    SessionManager sessionManager;
     Button btn_reg, btn_log;
-    Intent i_reg, i_log;
+    Intent i_reg, i_log, i_logged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sessionManager=new SessionManager(this);
 
         btn_reg = findViewById(R.id.btn_register);
         i_reg = new Intent(this, RegisterActivity.class);
@@ -38,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
         btn_log = findViewById(R.id.btn_log);
         i_log = new Intent(this, LoginActivity.class);
 
+//        i_logged = new Intent(this, LoggedActivity.class);
+//        if(sessionManager.preferences.getBoolean("KEY_ISLOGIN",false)){
+//            startActivity(i_logged);
+//        }
     }
 
     public void onClick(View view){

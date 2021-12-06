@@ -96,7 +96,7 @@ public class RegisterActivity extends AppCompatActivity {
                 CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
                 MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
                 System.out.println("EXAMPLE" + "Successfully instantiated the MongoDB collection handle");
-                mongoCollection.insertOne(new UserObject(et_login.getText().toString(), hash(et_passw.getText().toString()), et_mail.getText().toString(), et_name.getText().toString(), et_surname.getText().toString(), currentDate)).getAsync(task -> {
+                mongoCollection.insertOne(new UserObject(et_login.getText().toString(), hash(et_passw.getText().toString()), et_mail.getText().toString(), et_name.getText().toString(), et_surname.getText().toString(), currentDate, "http://pogadankowo.cba.pl/avatars/default.png")).getAsync(task -> {
                     if (task.isSuccess()) {
                         System.out.println("EXAMPLE " + "successfully inserted a document with id: " + task.get().getInsertedId());
                     } else {

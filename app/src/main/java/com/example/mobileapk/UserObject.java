@@ -9,17 +9,20 @@ public class UserObject {
     private String password;
     private String mail;
     private String data;
+    private String avatar;
     private UserName userName;
+
 
     public UserObject() {
     }
 
-    public UserObject(String login, String password, String mail, String name, String surname, String data) {
+    public UserObject(String login, String password, String mail, String name, String surname, String data, String avatar) {
 
         this.login = login;
         this.password = password;
         this.mail = mail;
         this.data = data;
+        this.avatar = avatar;
         this.userName = new UserName(name, surname);
     }
 
@@ -41,6 +44,10 @@ public class UserObject {
 
     public String getData() {
         return data;
+    }
+
+    public String getAvatar() {
+        return avatar;
     }
 
     public UserName getUserName() {
@@ -65,6 +72,10 @@ public class UserObject {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public void setUserName(UserName userName) {

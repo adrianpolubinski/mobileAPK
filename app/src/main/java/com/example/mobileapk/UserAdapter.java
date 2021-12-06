@@ -14,6 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.util.ArrayList;
 
 class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
@@ -44,6 +47,13 @@ class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         context=holder.cardView.getContext();
+
+        ImageView iv= holder.cardView.findViewById(R.id.avatar);
+        Glide.with(context).load(osoby.get(position).getAvatar())
+                .diskCacheStrategy(DiskCacheStrategy.NONE )
+                .skipMemoryCache(true)
+                .into(iv);
+
         TextView tv= holder.cardView.findViewById(R.id.textViewPerson);
         tv.setText(osoby.get(position).getUserName().getName() + " " + osoby.get(position).getUserName().getSurname());
     }
