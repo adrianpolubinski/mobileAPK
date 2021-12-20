@@ -23,6 +23,7 @@ class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
 
     ArrayList<UserObject> osoby;
     Context context;
+    Intent i_rozmowa;
 
     public Adapter_person(ArrayList<UserObject> osoby){
         this.osoby=osoby;
@@ -45,7 +46,7 @@ class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         context=holder.cardView.getContext();
 
         ImageView iv= holder.cardView.findViewById(R.id.avatar);
@@ -56,6 +57,17 @@ class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
 
         TextView tv= holder.cardView.findViewById(R.id.textViewPerson);
         tv.setText(osoby.get(position).getUserName().getName() + " " + osoby.get(position).getUserName().getSurname());
+
+        i_rozmowa=new Intent(context, ChatActivity.class);
+        Button btn = holder.cardView.findViewById(R.id.buttonOpenChat);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i_rozmowa.putExtra("name",String.valueOf(osoby.get(position).getUserName().getName() + " " + osoby.get(position).getUserName().getSurname()));
+                i_rozmowa.putExtra("id", String.valueOf(osoby.get(position).getId()));
+                context.startActivity(i_rozmowa);
+            }
+        });
     }
 
     @Override

@@ -12,6 +12,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorGray">#5F6C77</color>
+    <color name="colorBlue">#2196F3</color>
 
     <color name="colorOfHeaderNavigation">#FF3700B3</color>
     <color name="colorOfNavigation">#ffffff</color>
