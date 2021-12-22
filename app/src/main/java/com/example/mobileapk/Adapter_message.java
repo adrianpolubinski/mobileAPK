@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.bson.types.ObjectId;
+
 import java.util.ArrayList;
 
 class Adapter_message extends RecyclerView.Adapter<Adapter_message.ViewHolder> {
@@ -48,10 +50,11 @@ class Adapter_message extends RecyclerView.Adapter<Adapter_message.ViewHolder> {
         context=holder.cardView.getContext();
         TextView tv= holder.cardView.findViewById(R.id.textViewMessage);
         LinearLayout ll= holder.cardView.findViewById(R.id.linearLayoutMessage);
+
         tv.setText(messages.get(position));
 
-        if(id_user==id_from.get(position)){
-            tv.setBackground(context.getResources().getDrawable(R.drawable.received_message));
+        if( id_user.equals(id_from.get(position))){
+            tv.setBackground(context.getResources().getDrawable(R.drawable.send_message));
             tv.setMaxWidth(maxWidth);
             ll.setGravity(Gravity.RIGHT);
         }
@@ -60,7 +63,6 @@ class Adapter_message extends RecyclerView.Adapter<Adapter_message.ViewHolder> {
             tv.setMaxWidth(maxWidth);
             ll.setGravity(Gravity.LEFT);
         }
-
     }
 
     @Override

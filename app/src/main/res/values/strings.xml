@@ -29,8 +29,8 @@
     <string name="menu_opt2">Moje konto</string>
     <string name="menu_opt3">O aplikacji</string>
     <string name="menu_opt4">Wyloguj</string>
-    <string name="send_button">Wyślij wiadomość</string>
-    <string name="hint_message">Wyślij wiadomość...</string>
+    <string name="send_button">Wyślij</string>
+    <string name="hint_message">Wpisz wiadomość...</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

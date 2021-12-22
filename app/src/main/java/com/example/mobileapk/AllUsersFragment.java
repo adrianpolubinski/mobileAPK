@@ -23,6 +23,7 @@ import io.realm.mongodb.App;
 import io.realm.mongodb.AppConfiguration;
 import io.realm.mongodb.Credentials;
 import io.realm.mongodb.RealmResultTask;
+import io.realm.mongodb.User;
 import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
 import io.realm.mongodb.mongo.MongoDatabase;
@@ -56,19 +57,26 @@ public class AllUsersFragment extends Fragment {
     void refreshUsers() {
 
         App app = new App(new AppConfiguration.Builder(Appid).build());
-        Credentials apiKeyCredentials = Credentials.apiKey("H4cVO8qT8q8cehZVoI3QRsiN17XXY2QZZQ0wSDvcAZZck8KZNFL6UuVCdlob5nz2");
-        app.loginAsync(apiKeyCredentials, it -> {
-            if (it.isSuccess()) {
-                Log.v("BAZA DANYCH", "Udane logowanie za pomocą api KEY.");
-            } else {
-                Log.e("BAZA DANYCH", "Wystąpił problem z logowaniem za pomocą api KEY.");
-            }
-        });
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // TO chyba musi wystapic tylko taz przy logowaniu uzytkownika pozniej pamieta realm//
+        //////////////////////////////////////////////////////////////////////////////////////
+
+//        Credentials apiKeyCredentials = Credentials.apiKey("H4cVO8qT8q8cehZVoI3QRsiN17XXY2QZZQ0wSDvcAZZck8KZNFL6UuVCdlob5nz2");
+//        app.loginAsync(apiKeyCredentials, it -> {
+//            if (it.isSuccess()) {
+//                Log.v("BAZA DANYCH", "Udane logowanie za pomocą api KEY.");
+//            } else {
+//                Log.e("BAZA DANYCH", "Wystąpił problem z logowaniem za pomocą api KEY.");
+//            }
+//        });
 
         MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
         MongoDatabase mongoDatabase = mongoClient.getDatabase("messanger");
         CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
         MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
+
 
         Document queryFilter = new Document();
         RealmResultTask<MongoCursor<UserObject>> findTask = mongoCollection.find(queryFilter).iterator();
@@ -76,7 +84,10 @@ public class AllUsersFragment extends Fragment {
             if (task.isSuccess()) {
                 MongoCursor<UserObject> results = task.get();
                 while (results.hasNext()) {
-                    osoby.add(results.next());
+                    UserObject user = results.next();
+                    if(sessionManager.preferences.getString("KEY_ID","").equals(user.getId().toString()))
+                        continue;
+                    osoby.add(user);
                 }
                 person_recycler.setAdapter(new Adapter_person(osoby));
             } else {

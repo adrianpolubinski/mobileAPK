@@ -1,66 +1,45 @@
 package com.example.mobileapk;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.in;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Message;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bson.conversions.Bson;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import es.dmoral.toasty.Toasty;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmResults;
 import io.realm.mongodb.App;
 import io.realm.mongodb.AppConfiguration;
-import io.realm.mongodb.Credentials;
 import io.realm.mongodb.RealmResultTask;
-import io.realm.mongodb.User;
 import io.realm.mongodb.mongo.MongoClient;
 import io.realm.mongodb.mongo.MongoCollection;
 import io.realm.mongodb.mongo.MongoDatabase;
-import io.realm.mongodb.mongo.iterable.FindIterable;
 import io.realm.mongodb.mongo.iterable.MongoCursor;
 
 public class ChatActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
-    private ArrayList<String> parameters;
+
     private Intent i_back, intent;
     private SessionManager sessionManager;
     private EditText et_message;
@@ -69,9 +48,12 @@ public class ChatActivity extends AppCompatActivity {
     private int maxDisplayWidth;
     String Appid = "application-0-tfcfh";
     Boolean scrollingToBottom;
-    Thread refresh;
+    Thread thread;
     Toolbar mActionBarToolbar;
     Parcelable recyclerViewState;
+    Runnable r;
+    boolean off=false;
+    AtomicBoolean firstRefresh= new AtomicBoolean(false);
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -87,8 +69,23 @@ public class ChatActivity extends AppCompatActivity {
         mActionBarToolbar = (Toolbar) findViewById(R.id.myToolbar);
         getSupportActionBar().setTitle(intent.getStringExtra("name"));
         send_to = intent.getStringExtra("id");
-//        refresh();
 
+
+        Handler handler = new Handler();
+        r = new Runnable() {
+            public void run() {
+                if(off) return;
+                RefreshMessage();
+                handler.postDelayed(this, 1000);
+            }
+        };
+        r.run();
+    }
+
+
+    public void onBackPressed() {
+        super.onBackPressed();
+        off=true;
     }
 
     public void ustawToolbar() {
@@ -163,26 +160,15 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    public void refresh() {
-        refresh = new Thread(new Runnable() {
-            public void run() {
-                while (true) {
-                    try {
-                        RefreshMessage();
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        refresh.start();
-    }
+
+
+
 
     void RefreshMessage() {
-        String from = sessionManager.preferences.getString("KEY_ID", "");
+
+        String id_user = sessionManager.preferences.getString("KEY_ID", "");
         ArrayList<String> messages = new ArrayList<>();
-        ArrayList<String> id_send_from = new ArrayList<>();
+        ArrayList<String> id_send_from= new ArrayList<>();
 
         App app = new App(new AppConfiguration.Builder(Appid).build());
         MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
@@ -190,30 +176,48 @@ public class ChatActivity extends AppCompatActivity {
         CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
         MongoCollection<MessageObject> mongoCollection = mongoDatabase.getCollection("messages", MessageObject.class).withCodecRegistry(pojoCodecRegistry);
 
-        Document queryFilter = new Document();
+        Document queryFilter = new Document("$or", Arrays.asList(
+
+                    new Document("$and",
+                            Arrays.asList(
+                                new Document("send_to",id_user),
+                                new Document("send_from",send_to)
+                    )),
+
+                    new Document("$and",
+                            Arrays.asList(
+                                new Document("send_to",send_to),
+                                new Document("send_from",id_user)
+                    ))
+                ));
+
+
         RealmResultTask<MongoCursor<MessageObject>> findTask = mongoCollection.find(queryFilter).iterator();
+
         findTask.getAsync(task -> {
-            if (task.isSuccess()) {
-                MongoCursor<MessageObject> results = task.get();
-                while (results.hasNext()) {
-                    messages.add(results.next().getMessage_content());
-                    id_send_from.add(results.next().getSend_from());
-                }
-                LinearLayoutManager myLayoutManager = (LinearLayoutManager) recycler_messages.getLayoutManager();
-                System.out.println();
+                if (task.isSuccess()) {
 
-                recyclerViewState = recycler_messages.getLayoutManager().onSaveInstanceState();
-                if (myLayoutManager.findLastVisibleItemPosition() == messages.size() - 1 || myLayoutManager.findLastVisibleItemPosition() == messages.size() - 2) {
-                    recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, from, maxDisplayWidth));
-                    recycler_messages.scrollToPosition(messages.size() - 1);
+                    MongoCursor<MessageObject> results = task.get();
+                    while (results.hasNext()) {
+                        MessageObject message = results.next();
+                        messages.add(message.getMessage_content());
+                        id_send_from.add(message.getSend_from());
+                    }
+                    LinearLayoutManager myLayoutManager = (LinearLayoutManager) recycler_messages.getLayoutManager();
+                    recyclerViewState = recycler_messages.getLayoutManager().onSaveInstanceState();
+
+                    if (myLayoutManager.findLastVisibleItemPosition() == messages.size() - 1 || myLayoutManager.findLastVisibleItemPosition() == messages.size() - 2 || firstRefresh.get() ==false) {
+                        recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
+                        recycler_messages.scrollToPosition(messages.size() - 1);
+                        firstRefresh.set(true);
+
+                    } else {
+                        recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
+                        recycler_messages.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                    }
                 } else {
-                    recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, from, maxDisplayWidth));
-                    recycler_messages.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                    Log.e("WYSZUKIWANIE", "failed to find documents with: ", task.getError());
                 }
-            } else {
-                Log.e("WYSZUKIWANIE", "failed to find documents with: ", task.getError());
-            }
         });
-
     }
 }

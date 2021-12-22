@@ -49,6 +49,7 @@ class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         context=holder.cardView.getContext();
 
+
         ImageView iv= holder.cardView.findViewById(R.id.avatar);
         Glide.with(context).load(osoby.get(position).getAvatar())
                 .diskCacheStrategy(DiskCacheStrategy.NONE )

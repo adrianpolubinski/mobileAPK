@@ -109,14 +109,10 @@ public class LoggedActivity extends AppCompatActivity {
         iv = nvDrawer.getHeaderView(0).findViewById(R.id.avatar);
 
 
-
-        Glide.with(this).load(sessionManager.preferences.getString("AVATAR","https://pogadankowo.refy.pl/avatars/default.png"))
+        Glide.with(this).load(sessionManager.preferences.getString("KEY_AVATAR","https://pogadankowo.refy.pl/avatars/default.png"))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(iv);
-
-
-
 
 
         tv_podpis = (TextView) nvDrawer.getHeaderView(0).findViewById(R.id.tv_podpis);
@@ -301,7 +297,6 @@ public class LoggedActivity extends AppCompatActivity {
                 login = sessionManager.preferences.getString("KEY_LOGIN", "");
 
                 ftp = new FTPClient();
-                System.out.println(ftp_path + login + ftp_rozszerzenie);
                 ftp.connect(ftp_host);
                 ftp.login(ftp_login, ftp_haslo);
                 ftp.setFileType(FTP.BINARY_FILE_TYPE);
@@ -332,14 +327,6 @@ public class LoggedActivity extends AppCompatActivity {
 
     void updateAvatar(){
         App app = new App(new AppConfiguration.Builder(Appid).build());
-        Credentials apiKeyCredentials = Credentials.apiKey("H4cVO8qT8q8cehZVoI3QRsiN17XXY2QZZQ0wSDvcAZZck8KZNFL6UuVCdlob5nz2");
-        app.loginAsync(apiKeyCredentials, it -> {
-            if (it.isSuccess()) {
-                Log.v("BAZA DANYCH", "Udane logowanie za pomocą api KEY.");
-            } else {
-                Log.e("BAZA DANYCH", "Wystąpił problem z logowaniem za pomocą api KEY.");
-            }
-        });
 
         MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
         MongoDatabase mongoDatabase = mongoClient.getDatabase("messanger");
@@ -347,10 +334,7 @@ public class LoggedActivity extends AppCompatActivity {
         MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
 
         String login =  sessionManager.preferences.getString("KEY_LOGIN", "");
-
         Document queryFilter = new Document("login", login);
-
-        System.out.println(sessionManager.preferences.getString("KEY_ID",""));
         Document updateDocument = new Document("$set", new Document("avatar", "https://pogadankowo.refy.pl/avatars/"+login+".png"));
         mongoCollection.updateOne(queryFilter, updateDocument).getAsync(task -> {
             if (task.isSuccess()) {
@@ -364,6 +348,8 @@ public class LoggedActivity extends AppCompatActivity {
                 Log.e("EXAMPLE", "failed to update document with: ", task.getError());
             }
         });
+
+
     }
 
 
