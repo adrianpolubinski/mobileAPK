@@ -40,10 +40,11 @@ public class MainActivity extends AppCompatActivity {
         btn_log = findViewById(R.id.btn_log);
         i_log = new Intent(this, LoginActivity.class);
 
-//        i_logged = new Intent(this, LoggedActivity.class);
-//        if(sessionManager.preferences.getBoolean("KEY_ISLOGIN",false)){
-//            startActivity(i_logged);
-//        }
+        Realm.init(getApplicationContext());
+        i_logged = new Intent(this, LoggedActivity.class);
+        if(sessionManager.preferences.getBoolean("KEY_ISLOGIN",false)){
+            startActivity(i_logged);
+        }
     }
 
     public void onClick(View view){

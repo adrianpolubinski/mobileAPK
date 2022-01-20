@@ -30,9 +30,14 @@ public class SessionManager {
         editor.putString("KEY_NAZWISKO",nazwisko);
         editor.putString("KEY_AVATAR",avatar);
         editor.putBoolean("KEY_DARK", false);
+
         editor.commit();
     }
 
+    public void cacheAvatar(String code){
+        editor.putString("KEY_CACHE_AVATAR" , code);
+        editor.commit();
+    }
     public String pobierzLogin() { // login biezacego uzytkownika do update'u hasla
         login = preferences.getString("KEY_LOGIN", "");
         return login;

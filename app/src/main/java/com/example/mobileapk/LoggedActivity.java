@@ -4,6 +4,8 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -14,10 +16,20 @@ import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.style.UpdateAppearance;
 import android.util.Log;
@@ -30,7 +42,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.material.navigation.NavigationView;
 
 import org.apache.commons.net.ftp.FTP;
@@ -40,6 +56,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import es.dmoral.toasty.Toasty;
@@ -54,6 +71,7 @@ import io.realm.mongodb.mongo.MongoDatabase;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Statement;
+import android.util.Base64;
 
 
 public class LoggedActivity extends AppCompatActivity {
@@ -73,6 +91,7 @@ public class LoggedActivity extends AppCompatActivity {
     boolean wroc;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,11 +128,6 @@ public class LoggedActivity extends AppCompatActivity {
         iv = nvDrawer.getHeaderView(0).findViewById(R.id.avatar);
 
 
-        Glide.with(this).load(sessionManager.preferences.getString("KEY_AVATAR","https://pogadankowo.refy.pl/avatars/default.png"))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(iv);
-
 
         tv_podpis = (TextView) nvDrawer.getHeaderView(0).findViewById(R.id.tv_podpis);
         tv_podpis.setText(sessionManager.preferences.getString("KEY_IMIE", "IMIĘ") + " " + sessionManager.preferences.getString("KEY_NAZWISKO", ""));
@@ -123,10 +137,94 @@ public class LoggedActivity extends AppCompatActivity {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
+
+        if(isOnline()){
+        Glide.with(this).load(sessionManager.preferences.getString("KEY_AVATAR","https://pogadankowo.refy.pl/avatars/default.png"))
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        return false; // important to return false so the error placeholder can be placed
+                    }
+
+                    @SuppressLint("CheckResult")
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        String imageBase64 = convert(drawableToBitmap(resource));
+                        sessionManager.cacheAvatar(imageBase64);
+                        return false;
+                    }
+                })
+                .into(iv);
+        } else{
+            Bitmap bm = convert(sessionManager.preferences.getString("KEY_CACHE_AVATAR",""));
+            iv.setImageBitmap(bm);
+        }
+
+
+
     }
+
+    public boolean isOnline() {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+
+        if(networkInfo != null && networkInfo.isConnected()){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
+
+    public static Bitmap convert(String base64Str) throws IllegalArgumentException
+    {
+        byte[] decodedBytes = Base64.decode(
+                base64Str.substring(base64Str.indexOf(",")  + 1),
+                Base64.DEFAULT
+        );
+
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
+
+    public static String convert(Bitmap bitmap)
+    {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
+        return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        Bitmap bitmap = null;
+
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            if (bitmapDrawable.getBitmap() != null) {
+                return bitmapDrawable.getBitmap();
+            }
+        }
+
+        if (drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        } else  {
+            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.toolbar_menu_view, menu);
         return true;
     }
@@ -160,6 +258,7 @@ public class LoggedActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void onBackPressed() {
         if(wroc) {
             mDrawer.closeDrawers();
@@ -203,7 +302,9 @@ public class LoggedActivity extends AppCompatActivity {
                         return true;
                     }
                 });
+
     }
+
 
     public void selectDrawerItem(MenuItem menuItem) {
         if(wroc) {wroc=!wroc;}
@@ -348,7 +449,6 @@ public class LoggedActivity extends AppCompatActivity {
                 Log.e("EXAMPLE", "failed to update document with: ", task.getError());
             }
         });
-
 
     }
 

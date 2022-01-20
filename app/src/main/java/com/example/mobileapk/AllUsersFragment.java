@@ -1,23 +1,40 @@
 package com.example.mobileapk;
+import static com.example.mobileapk.LoggedActivity.convert;
+import static com.example.mobileapk.LoggedActivity.drawableToBitmap;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.codecs.pojo.PropertyCodecRegistry;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.mongodb.App;
 import io.realm.mongodb.AppConfiguration;
@@ -34,8 +51,10 @@ public class AllUsersFragment extends Fragment {
     String Appid = "application-0-tfcfh";
     SessionManager sessionManager;
     ArrayList<UserObject> osoby;
+    ArrayList<String> avatars;
     RecyclerView person_recycler;
     Context context;
+    ImageView iv;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,31 +65,38 @@ public class AllUsersFragment extends Fragment {
         person_recycler = v.findViewById(R.id.recyclerView);
         person_recycler.setLayoutManager(new LinearLayoutManager(context));
         osoby = new ArrayList<>();
-
+        avatars = new ArrayList<>();
         // Repair: E/RecyclerView: No adapter attached; skipping layout
         person_recycler.setAdapter(new Adapter_person(osoby));
 
-        refreshUsers();
+        iv = new ImageView(getContext());
+
+        if(isOnline()){
+            refreshUsers();
+        }
+        else{
+            ArrayList<RecyclerView> adapter = PrefConf.readListAvatars(getContext());
+            person_recycler = adapter.get(0);
+        }
+
         return v;
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+
+        if(networkInfo != null && networkInfo.isConnected()){
+                return true;
+        }
+        else{
+            return false;
+        }
     }
 
     void refreshUsers() {
 
         App app = new App(new AppConfiguration.Builder(Appid).build());
-
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        // TO chyba musi wystapic tylko taz przy logowaniu uzytkownika pozniej pamieta realm//
-        //////////////////////////////////////////////////////////////////////////////////////
-
-//        Credentials apiKeyCredentials = Credentials.apiKey("H4cVO8qT8q8cehZVoI3QRsiN17XXY2QZZQ0wSDvcAZZck8KZNFL6UuVCdlob5nz2");
-//        app.loginAsync(apiKeyCredentials, it -> {
-//            if (it.isSuccess()) {
-//                Log.v("BAZA DANYCH", "Udane logowanie za pomocą api KEY.");
-//            } else {
-//                Log.e("BAZA DANYCH", "Wystąpił problem z logowaniem za pomocą api KEY.");
-//            }
-//        });
 
         MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
         MongoDatabase mongoDatabase = mongoClient.getDatabase("messanger");
@@ -89,10 +115,27 @@ public class AllUsersFragment extends Fragment {
                         continue;
                     osoby.add(user);
                 }
+
+
+
+
+
+
+
+
                 person_recycler.setAdapter(new Adapter_person(osoby));
+                ArrayList<RecyclerView> list = new ArrayList<>();
+                list.add(person_recycler);
+                PrefConf.writeListAvatars(getContext(), list);
             } else {
                 Log.e("WYSZUKIWANIE", "failed to find documents with: ", task.getError());
             }
         });
+
+
+
+
+
+
     }
 }

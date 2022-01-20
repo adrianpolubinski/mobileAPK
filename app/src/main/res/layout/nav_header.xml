@@ -23,6 +23,7 @@
         app:civ_circle_background_color="@color/colorOfNavigation"
         />
 
+
     <TextView
         android:id="@+id/tv_podpis"
         android:layout_width="wrap_content"

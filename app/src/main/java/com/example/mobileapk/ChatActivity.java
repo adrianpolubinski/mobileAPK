@@ -1,5 +1,7 @@
 package com.example.mobileapk;
 
+import static com.mongodb.client.model.Indexes.ascending;
+import static com.mongodb.client.model.Indexes.descending;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -26,6 +28,8 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.realm.mongodb.App;
@@ -163,7 +167,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
-
+    int limit = 15;
     void RefreshMessage() {
 
         String id_user = sessionManager.preferences.getString("KEY_ID", "");
@@ -192,7 +196,10 @@ public class ChatActivity extends AppCompatActivity {
                 ));
 
 
-        RealmResultTask<MongoCursor<MessageObject>> findTask = mongoCollection.find(queryFilter).iterator();
+
+
+        RealmResultTask<MongoCursor<MessageObject>> findTask = mongoCollection.find(queryFilter).limit(limit).sort(descending("_id")).iterator();
+
 
         findTask.getAsync(task -> {
                 if (task.isSuccess()) {
@@ -203,6 +210,10 @@ public class ChatActivity extends AppCompatActivity {
                         messages.add(message.getMessage_content());
                         id_send_from.add(message.getSend_from());
                     }
+
+                    Collections.reverse(messages);
+                    Collections.reverse(id_send_from);
+
                     LinearLayoutManager myLayoutManager = (LinearLayoutManager) recycler_messages.getLayoutManager();
                     recyclerViewState = recycler_messages.getLayoutManager().onSaveInstanceState();
 
@@ -211,7 +222,13 @@ public class ChatActivity extends AppCompatActivity {
                         recycler_messages.scrollToPosition(messages.size() - 1);
                         firstRefresh.set(true);
 
-                    } else {
+                    } else if(myLayoutManager.findFirstVisibleItemPosition() == 0){
+                        recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
+                        recycler_messages.scrollToPosition(1);
+                        limit+=5;
+
+                    }
+                    else {
                         recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
                         recycler_messages.getLayoutManager().onRestoreInstanceState(recyclerViewState);
                     }
