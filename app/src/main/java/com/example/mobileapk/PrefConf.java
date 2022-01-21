@@ -20,27 +20,7 @@ import io.realm.mongodb.User;
 
 public class PrefConf {
 
-    public static void writeListAvatars(Context context, ArrayList<RecyclerView> list){
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(list);
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("KEY_LIST", jsonString);
-        editor.apply();
-    }
-
-    public static ArrayList<RecyclerView> readListAvatars(Context context){
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        String jsonString = pref.getString("KEY_LIST","");
-
-        Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<RecyclerView>>() {}.getType();
-        ArrayList<RecyclerView> list = gson.fromJson(jsonString, type);
-
-        return list;
-    }
-
-    public static void writeListPersons(Context context, ArrayList<Adapter_person> list){
+    public static void writeListPersons(Context context, ArrayList<UserObject> list){
         Gson gson = new Gson();
         String jsonString = gson.toJson(list);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
@@ -49,13 +29,33 @@ public class PrefConf {
         editor.apply();
     }
 
-    public static  ArrayList<Adapter_person> readListPersons(Context context){
+    public static  ArrayList<UserObject> readListPersons(Context context){
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         String jsonString = pref.getString("KEY_LIST_PERSONS","");
 
         Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<Adapter_person>>() {}.getType();
-        ArrayList<Adapter_person> list = gson.fromJson(jsonString, type);
+        Type type = new TypeToken<ArrayList<UserObject>>() {}.getType();
+        ArrayList<UserObject> list = gson.fromJson(jsonString, type);
+
+        return list;
+    }
+
+    public static void writeListMessage(Context context, ArrayList<MessageObject> list, String key){
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(list);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(key, jsonString);
+        editor.apply();
+    }
+
+    public static  ArrayList<MessageObject> readListMessage(Context context, String key){
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        String jsonString = pref.getString(key,"");
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<MessageObject>>() {}.getType();
+        ArrayList<MessageObject> list = gson.fromJson(jsonString, type);
 
         return list;
     }

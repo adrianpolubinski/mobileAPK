@@ -38,6 +38,12 @@ public class SessionManager {
         editor.putString("KEY_CACHE_AVATAR" , code);
         editor.commit();
     }
+
+    public void cacheAvatars(String code, String key){
+        editor.putString(key , code);
+        editor.commit();
+    }
+
     public String pobierzLogin() { // login biezacego uzytkownika do update'u hasla
         login = preferences.getString("KEY_LOGIN", "");
         return login;

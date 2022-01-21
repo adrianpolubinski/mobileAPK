@@ -67,7 +67,7 @@ public class AllUsersFragment extends Fragment {
         osoby = new ArrayList<>();
         avatars = new ArrayList<>();
         // Repair: E/RecyclerView: No adapter attached; skipping layout
-        person_recycler.setAdapter(new Adapter_person(osoby));
+        person_recycler.setAdapter(new Adapter_person(osoby,sessionManager));
 
         iv = new ImageView(getContext());
 
@@ -75,8 +75,8 @@ public class AllUsersFragment extends Fragment {
             refreshUsers();
         }
         else{
-            ArrayList<RecyclerView> adapter = PrefConf.readListAvatars(getContext());
-            person_recycler = adapter.get(0);
+            osoby= PrefConf.readListPersons(context);
+            person_recycler.setAdapter(new Adapter_person(osoby, sessionManager));
         }
 
         return v;
@@ -97,12 +97,10 @@ public class AllUsersFragment extends Fragment {
     void refreshUsers() {
 
         App app = new App(new AppConfiguration.Builder(Appid).build());
-
         MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
         MongoDatabase mongoDatabase = mongoClient.getDatabase("messanger");
         CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
         MongoCollection<UserObject> mongoCollection = mongoDatabase.getCollection("users", UserObject.class).withCodecRegistry(pojoCodecRegistry);
-
 
         Document queryFilter = new Document();
         RealmResultTask<MongoCursor<UserObject>> findTask = mongoCollection.find(queryFilter).iterator();
@@ -115,27 +113,11 @@ public class AllUsersFragment extends Fragment {
                         continue;
                     osoby.add(user);
                 }
-
-
-
-
-
-
-
-
-                person_recycler.setAdapter(new Adapter_person(osoby));
-                ArrayList<RecyclerView> list = new ArrayList<>();
-                list.add(person_recycler);
-                PrefConf.writeListAvatars(getContext(), list);
+                person_recycler.setAdapter(new Adapter_person(osoby,sessionManager));
+                PrefConf.writeListPersons(getContext(), osoby);
             } else {
                 Log.e("WYSZUKIWANIE", "failed to find documents with: ", task.getError());
             }
         });
-
-
-
-
-
-
     }
 }

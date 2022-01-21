@@ -36,10 +36,11 @@ class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
     ArrayList<UserObject> osoby;
     Context context;
     Intent i_rozmowa;
+    SessionManager sessionManager;
 
-
-    public Adapter_person(ArrayList<UserObject> osoby){
+    public Adapter_person(ArrayList<UserObject> osoby, SessionManager sessionManager){
         this.osoby=osoby;
+        this.sessionManager=sessionManager;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
@@ -76,15 +77,37 @@ class Adapter_person extends RecyclerView.Adapter<Adapter_person.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         context=holder.cardView.getContext();
 
-
-
         ImageView iv= holder.cardView.findViewById(R.id.avatar);
 
         if(isOnline()) {
             Glide.with(context).load(osoby.get(position).getAvatar())
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            return false; // important to return false so the error placeholder can be placed
+                        }
+
+                        @SuppressLint("CheckResult")
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            String imageBase64 = convert(drawableToBitmap(resource));
+
+                            sessionManager.cacheAvatars(imageBase64, osoby.get(position).getUserName().getName());
+                            return false;
+                        }
+                    })
                     .into(iv);
+        }
+        else if(sessionManager.preferences.getString(osoby.get(position).getUserName().getName(),"") != ""){
+            iv.setImageBitmap(convert(sessionManager.preferences.getString(osoby.get(position).getUserName().getName(),"")));
+        }
+
+
+
+        if(position==osoby.size()-1){
+            System.out.println("ostatni");
         }
 
 
