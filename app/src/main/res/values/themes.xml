@@ -22,5 +22,4 @@
     <style name="Theme.MobileAPK.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.MobileAPK.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-
 </resources>

@@ -6,11 +6,8 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -167,17 +164,7 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    public boolean isOnline() {
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
 
-        if(networkInfo != null && networkInfo.isConnectedOrConnecting()){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
 
 
     int limit = 15;
@@ -187,111 +174,67 @@ public class ChatActivity extends AppCompatActivity {
         ArrayList<String> messages = new ArrayList<>();
         ArrayList<String> id_send_from= new ArrayList<>();
 
+        App app = new App(new AppConfiguration.Builder(Appid).build());
+        MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
+        MongoDatabase mongoDatabase = mongoClient.getDatabase("messanger");
+        CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+        MongoCollection<MessageObject> mongoCollection = mongoDatabase.getCollection("messages", MessageObject.class).withCodecRegistry(pojoCodecRegistry);
 
-        if(isOnline()) {
-            App app = new App(new AppConfiguration.Builder(Appid).build());
-            MongoClient mongoClient = app.currentUser().getMongoClient("mongodb-atlas");
-            MongoDatabase mongoDatabase = mongoClient.getDatabase("messanger");
-            CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY, fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-            MongoCollection<MessageObject> mongoCollection = mongoDatabase.getCollection("messages", MessageObject.class).withCodecRegistry(pojoCodecRegistry);
-
-            Document queryFilter = new Document("$or", Arrays.asList(
+        Document queryFilter = new Document("$or", Arrays.asList(
 
                     new Document("$and",
                             Arrays.asList(
-                                    new Document("send_to", id_user),
-                                    new Document("send_from", send_to)
-                            )),
+                                new Document("send_to",id_user),
+                                new Document("send_from",send_to)
+                    )),
 
                     new Document("$and",
                             Arrays.asList(
-                                    new Document("send_to", send_to),
-                                    new Document("send_from", id_user)
-                            ))
-            ));
+                                new Document("send_to",send_to),
+                                new Document("send_from",id_user)
+                    ))
+                ));
 
 
-            RealmResultTask<MongoCursor<MessageObject>> findTask = mongoCollection.find(queryFilter).limit(limit).sort(descending("_id")).iterator();
 
-            ArrayList<MessageObject> mo = new ArrayList<>();
-            findTask.getAsync(task -> {
+
+        RealmResultTask<MongoCursor<MessageObject>> findTask = mongoCollection.find(queryFilter).limit(limit).sort(descending("_id")).iterator();
+
+
+        findTask.getAsync(task -> {
                 if (task.isSuccess()) {
 
                     MongoCursor<MessageObject> results = task.get();
                     while (results.hasNext()) {
                         MessageObject message = results.next();
-                        mo.add(message);
                         messages.add(message.getMessage_content());
                         id_send_from.add(message.getSend_from());
                     }
 
-                    PrefConf.writeListMessage(getApplicationContext(), mo, send_to);
-
                     Collections.reverse(messages);
                     Collections.reverse(id_send_from);
-
 
                     LinearLayoutManager myLayoutManager = (LinearLayoutManager) recycler_messages.getLayoutManager();
                     recyclerViewState = recycler_messages.getLayoutManager().onSaveInstanceState();
 
-                    if (myLayoutManager.findLastVisibleItemPosition() == messages.size() - 1 || myLayoutManager.findLastVisibleItemPosition() == messages.size() - 2 || firstRefresh.get() == false) {
+                    if (myLayoutManager.findLastVisibleItemPosition() == messages.size() - 1 || myLayoutManager.findLastVisibleItemPosition() == messages.size() - 2 || firstRefresh.get() ==false) {
                         recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
                         recycler_messages.scrollToPosition(messages.size() - 1);
                         firstRefresh.set(true);
 
-                    } else if (myLayoutManager.findFirstVisibleItemPosition() == 0) {
+                    } else if(myLayoutManager.findFirstVisibleItemPosition() == 0){
                         recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
                         recycler_messages.scrollToPosition(1);
-                        limit += 5;
+                        limit+=5;
 
-                    } else {
+                    }
+                    else {
                         recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
                         recycler_messages.getLayoutManager().onRestoreInstanceState(recyclerViewState);
                     }
                 } else {
                     Log.e("WYSZUKIWANIE", "failed to find documents with: ", task.getError());
                 }
-            });
-
-        }
-        else
-        {
-            ArrayList<MessageObject> mo = PrefConf.readListMessage(getApplicationContext(), send_to);
-            if(mo == null){
-                return;
-            }
-            else{
-                for(int i=0; i<mo.size(); i++){
-                    messages.add(mo.get(i).getMessage_content());
-                    id_send_from.add(mo.get(i).getSend_from());
-                }
-
-                Collections.reverse(messages);
-                Collections.reverse(id_send_from);
-                LinearLayoutManager myLayoutManager = (LinearLayoutManager) recycler_messages.getLayoutManager();
-                recyclerViewState = recycler_messages.getLayoutManager().onSaveInstanceState();
-
-                if (myLayoutManager.findLastVisibleItemPosition() == messages.size() - 1 || myLayoutManager.findLastVisibleItemPosition() == messages.size() - 2 || firstRefresh.get() == false) {
-                    recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
-                    recycler_messages.scrollToPosition(messages.size() - 1);
-                    firstRefresh.set(true);
-
-                } else if (myLayoutManager.findFirstVisibleItemPosition() == 0) {
-                    recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
-                    recycler_messages.scrollToPosition(1);
-                    limit += 5;
-
-                } else {
-                    recycler_messages.setAdapter(new Adapter_message(messages, id_send_from, id_user, maxDisplayWidth));
-                    recycler_messages.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-                }
-
-            }
-        }
-
-
-
-
-
+        });
     }
 }

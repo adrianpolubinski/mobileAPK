@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/backgroundcColor"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="UstawieniaFragment"
+    tools:context=".LoggedActivity"
     android:padding="24dp"
     android:orientation="vertical">
 
@@ -73,5 +73,73 @@
         android:layout_height="wrap_content"
         android:id="@+id/containerl"
         />
+
+    <LinearLayout
+        android:id="@+id/ll_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <EditText
+            android:id="@+id/et_new_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Imię"
+            android:inputType="textPersonName"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/et_new_surname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Nazwisko"
+            android:inputType="textPersonName"
+            android:minHeight="48dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <EditText
+            android:id="@+id/et_old_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Stare hasło"
+            android:inputType="textPassword"
+            android:minHeight="48dp"/>
+
+        <EditText
+            android:id="@+id/et_new_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/pass_haslo_rejestracja"
+            android:inputType="textPassword"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/et_new_password_r"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Powtórz hasło"
+            android:inputType="textPassword"
+            android:minHeight="48dp"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_chagne"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zmień"
+        android:visibility="invisible" />
 
 </LinearLayout>

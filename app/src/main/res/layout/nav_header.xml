@@ -20,8 +20,7 @@
         android:src="@drawable/avatar"
         app:civ_border_color="#FFFFFF"
         app:civ_border_width="2dp"
-        app:civ_circle_background_color="@color/colorOfNavigation"
-        />
+        app:civ_circle_background_color="@color/colorOfNavigation" />
 
 
     <TextView

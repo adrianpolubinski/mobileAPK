@@ -1,5 +1,6 @@
 package com.example.mobileapk;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -20,7 +21,8 @@ public class MotywFragment extends Fragment {
     private Button przelacz;
     SessionManager sessionManager;
 
-    public MotywFragment(){}
+    public MotywFragment() {
+    }
 
     public static MotywFragment newInstance() {
         MotywFragment fragment = new MotywFragment();
@@ -40,6 +42,18 @@ public class MotywFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_motyw, container, false);
         przelacz = v.findViewById(R.id.przelacz);
+        if(Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES) {
+            przelacz.setText("Motyw jasny");
+        } else {
+            przelacz.setText("Motyw ciemny");
+        }
+
+        przelacz.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
+        });
 
 
         return v;
